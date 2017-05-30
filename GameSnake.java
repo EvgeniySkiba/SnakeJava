@@ -1,4 +1,4 @@
-п»ї
+
 /**
  * Classic Game Snake
  */
@@ -7,15 +7,17 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import com.sun.javafx.tk.FontMetrics;
 
 public class GameSnake {
 	final String TITLE_OF_PROGRAM = "Classic Game Snake";
@@ -32,22 +34,22 @@ public class GameSnake {
 	final int START_SNAKE_X = 10;
 	final int START_SNAKE_Y = 10;
 
-	// Р·Р°РґРµСЂР¶РєР° РґР»СЏ Р°РЅРёРјР°С†РёРё
+	// задержка для анимации
 	final int SHOW_DELAY = 150;// in ms
 
-	// РєРѕРґС‹ РєР»Р°РІРёС€
+	// коды клавиш
 	final int LEFT = 37;
 	final int RIGHT = 39;
 	final int UP = 38;
 	final int DOWN = 40;
 
-	// СЃС‚Р°СЂС‚РѕРІРѕРµ РЅР°РїСЂР°РІР»РµРЅРёРµ
+	// стартовое направление
 	final int START_DIRECTION = RIGHT;
 
 	final Color DEFAULT_COLOR = Color.BLACK;
 	final Color FOOD_COLOR = Color.green;
 	final Color POISON_COLOR = Color.red;
-	
+
 	Snake snake;
 	Food food;
 
@@ -56,9 +58,11 @@ public class GameSnake {
 	Random random = new Random();
 	boolean gameOver = false;
 
+	Poison poison = new Poison();
+	Image apple, amanita; // images for food and poison
+
 	public static void main(String[] args) {
 		new GameSnake().go();
-
 	}
 
 	void go() {
@@ -66,9 +70,9 @@ public class GameSnake {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(FIELD_WIDTH * POINT_RADIUS + FIELD_DX, FIELD_HEIGHT * POINT_RADIUS + FIELD_DY);
 
-		// СЃС‚Р°СЂС‚РѕРІРѕРµ РїРѕР»РѕР¶РµРЅРёРµ РѕРєРЅР°
+		// стартовое положение окна
 		frame.setLocation(START_LOCATION, START_LOCATION);
-		// Р·Р°РїСЂРµС‚РёС‚СЊ РёР·РјРµРЅРµРЅРёРµ РѕРєРЅР°
+		// запретить изменение окна
 		frame.setResizable(false);
 
 		canvasPanel = new Canvas();
@@ -84,16 +88,23 @@ public class GameSnake {
 			}
 		});
 
+		try {
+			apple = ImageIO.read(new File("img/apple.png"));
+			amanita = ImageIO.read(new File("img/amanita.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		frame.setVisible(true);
 
 		snake = new Snake(START_SNAKE_X, START_SNAKE_Y, START_SNAKE_SIZE, START_DIRECTION);
 		food = new Food();
-		
+
 		while (!gameOver) {
 			snake.move();
-			
-			if(food.isEaten()){
+
+			if (food.isEaten()) {
 				food.next();
+				poison.add();
 			}
 			canvasPanel.repaint();
 
@@ -106,26 +117,26 @@ public class GameSnake {
 	}
 
 	public class Canvas extends JPanel {
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public void paint(Graphics g) {
 			super.paint(g);
 			snake.paint(g);
 			food.paint(g);
-			
-			if(gameOver){
+			poison.paint(g);
+			if (gameOver) {
 				g.setColor(Color.RED);
-				g.setFont(new Font("Arial", Font.BOLD,40));
+				g.setFont(new Font("Arial", Font.BOLD, 40));
 				java.awt.FontMetrics fm = g.getFontMetrics();
-				g.drawString(GAME_OVER_MSG,
-						(FIELD_WIDTH * POINT_RADIUS + FIELD_DX - fm.stringWidth(GAME_OVER_MSG))/2, 
-						(FIELD_HEIGHT * POINT_RADIUS + FIELD_DX)/2);
+				g.drawString(GAME_OVER_MSG, (FIELD_WIDTH * POINT_RADIUS + FIELD_DX - fm.stringWidth(GAME_OVER_MSG)) / 2,
+						(FIELD_HEIGHT * POINT_RADIUS + FIELD_DX) / 2);
 			}
 		}
 	}
 
 	class Snake {
 		ArrayList<Point> snake = new ArrayList<Point>();
-		// РЅР°РїСЂР°РІР»РµРЅРёРµ
 		int direction;
 
 		public Snake(int x, int y, int length, int direction) {
@@ -143,9 +154,9 @@ public class GameSnake {
 		}
 
 		boolean isFood(Point food) {
-			if(food == null)
+			if (food == null)
 				return false;
-			
+
 			return ((snake.get(0).getX() == food.getX()) && (snake.get(0).getY() == food.getY()));
 		}
 
@@ -154,7 +165,7 @@ public class GameSnake {
 			int y = snake.get(0).getY();
 
 			System.out.println("x : " + x + ", FIELD_WIDTH : " + FIELD_WIDTH);
-			// СЂР°СЃС‡РёС‚Р°С‚СЊ РЅРѕРІС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹ РґР»СЏ РіРѕР»РѕРІС‹
+			// расчитать новые координаты для головы
 			if (direction == LEFT) {
 				x--;
 			} else if (direction == RIGHT) {
@@ -165,7 +176,7 @@ public class GameSnake {
 				y++;
 			}
 
-			// СЃС‚РѕР»РєРЅРѕРІРµРЅРёСЏ СЃРѕ СЃС‚РѕСЂРѕРЅР°РјРё
+			// столкновения со сторонами
 			if (x > FIELD_WIDTH - 1) {
 				x = 0;
 			} else if (x < 0) {
@@ -176,36 +187,36 @@ public class GameSnake {
 				y = FIELD_HEIGHT - 1;
 			}
 
-			gameOver = isInsideSnake(x,y);
-			// РґРѕР±Р°РІРёС‚СЊ РЅРѕРІСѓСЋ РєРѕРѕСЂРґРёРЅР°С‚Сѓ РґР»СЏ РіРѕР»РѕРІС‹
+			gameOver = isInsideSnake(x, y) || poison.isPoison(x, y); // check
+																		// game
+																		// over
+			
 			snake.add(0, new Point(x, y));
 
-			// СЃС‚РѕР»РєРЅРѕРІРµРЅРёРµ РіРѕР»РѕРІС‹ СЃ РµРґРѕР№
+			// добавить новую координату для головы
 			if (isFood(food)) {
 				food.eat();
 				frame.setTitle(TITLE_OF_PROGRAM + " : " + snake.size());
 			} else {
-				// СѓРґР°Р»РёС‚СЊ РїРѕСЃР»РµРґРЅРёР№ РµР»РµРјРµРЅС‚
+				// значения из цифровых клавиш
 				snake.remove(snake.size() - 1);
 			}
 		}
 
-		boolean isInsideSnake(int x , int y){
-			
-			for(Point point : snake){
-				if(point.getX() == x && point.getY() == y)
-				{
+		boolean isInsideSnake(int x, int y) {
+
+			for (Point point : snake) {
+				if (point.getX() == x && point.getY() == y) {
 					return true;
 				}
 			}
-			
+
 			return false;
 		}
+
 		void setDirection(int direction) {
 			if (direction >= LEFT && direction <= DOWN) {
-				
-				// Р·РЅР°С‡РµРЅРёСЏ РёР· С†РёС„СЂРѕРІС‹С… РєР»Р°РІРёС€
-				if(Math.abs(this.direction - direction)!= 2){
+				if (Math.abs(this.direction - direction) != 2) {
 					this.direction = direction;
 				}
 			}
@@ -234,8 +245,7 @@ public class GameSnake {
 		}
 
 		void paint(Graphics g) {
-			g.setColor(color);
-			g.fillOval(x * POINT_RADIUS, y * POINT_RADIUS, POINT_RADIUS, POINT_RADIUS);
+			g.drawImage(apple, x * POINT_RADIUS, y * POINT_RADIUS, null);
 		}
 
 		void setXY(int x, int y) {
@@ -251,27 +261,56 @@ public class GameSnake {
 		}
 
 		public void next() {
-			int x,y;
-			
+			int x, y;
+
 			// РµРґР° РјРѕР¶РµС‚ РЅР°С…РѕРґРёС‚СЊСЃСЏ РІРЅСѓС‚Рё Р·РјРµРё
-			do
-			{
+			do {
 				x = random.nextInt(FIELD_WIDTH);
 				y = random.nextInt(FIELD_HEIGHT);
-			}while (snake.isInsideSnake(x,y)); 
-			
-			setXY(x,y);
+			} while (snake.isInsideSnake(x, y) || poison.isPoison(x, y));
+
+			setXY(x, y);
 		}
 
 		public boolean isEaten() {
-			if(this.getX()== -1 && this.getY() == -1)
+			if (this.getX() == -1 && this.getY() == -1)
 				return true;
-			
+
 			return false;
 		}
 
 		public void eat() {
-			setXY(-1,-1);
+			setXY(-1, -1);
+		}
+
+		boolean isFood(int x, int y) {
+			return (this.x == x) && (this.y == y);
+		}
+
+	}
+
+	class Poison {
+		private ArrayList<Point> poison = new ArrayList<Point>();
+
+		boolean isPoison(int x, int y) {
+			for (Point point : poison)
+				if ((point.getX() == x) && (point.getY() == y))
+					return true;
+			return false;
+		}
+
+		void add() {
+			int x, y;
+			do {
+				x = random.nextInt(FIELD_WIDTH);
+				y = random.nextInt(FIELD_HEIGHT);
+			} while (isPoison(x, y) || snake.isInsideSnake(x, y) || food.isFood(x, y));
+			poison.add(new Point(x, y)); // , POISON_COLOR));
+		}
+
+		void paint(Graphics g) {
+			for (Point point : poison)
+				g.drawImage(amanita, point.getX() * POINT_RADIUS, point.getY() * POINT_RADIUS, null);
 		}
 	}
 }
