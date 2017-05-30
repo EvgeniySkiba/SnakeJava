@@ -1,4 +1,4 @@
-
+п»ї
 /**
  * Classic Game Snake
  */
@@ -32,16 +32,16 @@ public class GameSnake {
 	final int START_SNAKE_X = 10;
 	final int START_SNAKE_Y = 10;
 
-	// задержка для анимации
+	// Р·Р°РґРµСЂР¶РєР° РґР»СЏ Р°РЅРёРјР°С†РёРё
 	final int SHOW_DELAY = 150;// in ms
 
-	// коды клавиш
+	// РєРѕРґС‹ РєР»Р°РІРёС€
 	final int LEFT = 37;
 	final int RIGHT = 39;
 	final int UP = 38;
 	final int DOWN = 40;
 
-	// стартовое направление
+	// СЃС‚Р°СЂС‚РѕРІРѕРµ РЅР°РїСЂР°РІР»РµРЅРёРµ
 	final int START_DIRECTION = RIGHT;
 
 	final Color DEFAULT_COLOR = Color.BLACK;
@@ -66,9 +66,9 @@ public class GameSnake {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(FIELD_WIDTH * POINT_RADIUS + FIELD_DX, FIELD_HEIGHT * POINT_RADIUS + FIELD_DY);
 
-		// стартовое положение окна
+		// СЃС‚Р°СЂС‚РѕРІРѕРµ РїРѕР»РѕР¶РµРЅРёРµ РѕРєРЅР°
 		frame.setLocation(START_LOCATION, START_LOCATION);
-		// запретить изменение окна
+		// Р·Р°РїСЂРµС‚РёС‚СЊ РёР·РјРµРЅРµРЅРёРµ РѕРєРЅР°
 		frame.setResizable(false);
 
 		canvasPanel = new Canvas();
@@ -125,7 +125,7 @@ public class GameSnake {
 
 	class Snake {
 		ArrayList<Point> snake = new ArrayList<Point>();
-		// направление
+		// РЅР°РїСЂР°РІР»РµРЅРёРµ
 		int direction;
 
 		public Snake(int x, int y, int length, int direction) {
@@ -154,7 +154,7 @@ public class GameSnake {
 			int y = snake.get(0).getY();
 
 			System.out.println("x : " + x + ", FIELD_WIDTH : " + FIELD_WIDTH);
-			// расчитать новые координаты для головы
+			// СЂР°СЃС‡РёС‚Р°С‚СЊ РЅРѕРІС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹ РґР»СЏ РіРѕР»РѕРІС‹
 			if (direction == LEFT) {
 				x--;
 			} else if (direction == RIGHT) {
@@ -165,7 +165,7 @@ public class GameSnake {
 				y++;
 			}
 
-			// столкновения со сторонами
+			// СЃС‚РѕР»РєРЅРѕРІРµРЅРёСЏ СЃРѕ СЃС‚РѕСЂРѕРЅР°РјРё
 			if (x > FIELD_WIDTH - 1) {
 				x = 0;
 			} else if (x < 0) {
@@ -177,15 +177,15 @@ public class GameSnake {
 			}
 
 			gameOver = isInsideSnake(x,y);
-			// добавить новую координату для головы
+			// РґРѕР±Р°РІРёС‚СЊ РЅРѕРІСѓСЋ РєРѕРѕСЂРґРёРЅР°С‚Сѓ РґР»СЏ РіРѕР»РѕРІС‹
 			snake.add(0, new Point(x, y));
 
-			// столкновение головы с едой
+			// СЃС‚РѕР»РєРЅРѕРІРµРЅРёРµ РіРѕР»РѕРІС‹ СЃ РµРґРѕР№
 			if (isFood(food)) {
 				food.eat();
 				frame.setTitle(TITLE_OF_PROGRAM + " : " + snake.size());
 			} else {
-				// удалить последний елемент
+				// СѓРґР°Р»РёС‚СЊ РїРѕСЃР»РµРґРЅРёР№ РµР»РµРјРµРЅС‚
 				snake.remove(snake.size() - 1);
 			}
 		}
@@ -204,7 +204,7 @@ public class GameSnake {
 		void setDirection(int direction) {
 			if (direction >= LEFT && direction <= DOWN) {
 				
-				// значения из цифровых клавиш
+				// Р·РЅР°С‡РµРЅРёСЏ РёР· С†РёС„СЂРѕРІС‹С… РєР»Р°РІРёС€
 				if(Math.abs(this.direction - direction)!= 2){
 					this.direction = direction;
 				}
@@ -253,7 +253,7 @@ public class GameSnake {
 		public void next() {
 			int x,y;
 			
-			// еда может находиться внути змеи
+			// РµРґР° РјРѕР¶РµС‚ РЅР°С…РѕРґРёС‚СЊСЃСЏ РІРЅСѓС‚Рё Р·РјРµРё
 			do
 			{
 				x = random.nextInt(FIELD_WIDTH);
